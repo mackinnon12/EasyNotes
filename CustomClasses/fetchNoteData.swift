@@ -53,5 +53,15 @@ class NoteViewModel: ObservableObject {
         }
     }
     
+    func updateNote(id: String, title: String, note: String, email: String) {
+        let db = Firestore.firestore()
+        
+        let title = ["title": title]
+        let note = ["note": note]
+
+        db.collection("notes").document(userEmail).collection("userNotes").document(id).updateData(title)
+        db.collection("notes").document(userEmail).collection("userNotes").document(id).updateData(note)
+    }
+    
 }
 

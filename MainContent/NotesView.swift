@@ -19,7 +19,7 @@ struct NotesView: View {
         NavigationView {
             VStack {
                 List (note.list) { item in
-                        NavigationLink(destination: EditNoteView(title: item.title, note: item.note)) {
+                    NavigationLink(destination: EditNoteView(id: item.id, title: item.title, note: item.note, email: item.email)) {
                             VStack(alignment: .leading) {
                                 Text(item.title)
                                     .font(.title3)

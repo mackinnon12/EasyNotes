@@ -9,10 +9,12 @@ import SwiftUI
 
 struct EditNoteView: View {
     @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
-    @State private var showingAlert = false
+    @ObservedObject var notes = NoteViewModel()
     
+    @State var id: String
     @State var title: String
     @State var note: String
+    @State var email: String
     
     var body: some View {
         VStack {
@@ -27,34 +29,16 @@ struct EditNoteView: View {
             
         }
         .navigationBarTitle("Note", displayMode: .inline)
-        //.navigationBarBackButtonHidden(true)
+        .navigationBarBackButtonHidden(true)
         .toolbar {
-            ToolbarItem(placement: .navigationBarTrailing) {
+            ToolbarItem(placement: .navigationBarLeading) {
                 Button(action: {
-                    print("Save note")
-//                    createNote(title: title, note: note, email: user.currentUser?.email ?? "Error no email found")
+                    notes.updateNote(id: id, title: title, note: note, email: email)
                     self.presentationMode.wrappedValue.dismiss()
                 }, label: {
-                    Text("Save")
+                    Text("Back")
                 })
             }
-//            ToolbarItem(placement: .navigationBarLeading) {
-//                Button(action: {
-//                    showingAlert = true
-//                }, label: {
-//                    Text("Cancel")
-//                })
-//                    .alert(isPresented:$showingAlert) {
-//                        Alert(
-//                            title: Text("Are you sure?"),
-//                            primaryButton: .destructive(Text("Discard Changes")) {
-//                                print("Discard")
-//                                self.presentationMode.wrappedValue.dismiss()
-//                            },
-//                            secondaryButton: .cancel()
-//                        )
-//                    }
-//            }
         }
     }
 }
