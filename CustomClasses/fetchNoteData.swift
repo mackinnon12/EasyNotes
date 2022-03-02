@@ -6,15 +6,41 @@
 //
 
 import SwiftUI
+import Foundation
+import FirebaseAuth
+import Firebase
+import FirebaseFirestore
 
-struct fetchNoteData: View {
-    var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+class NoteViewModel: ObservableObject {
+    @Published var list = [Notes]()
+    @State private var userEmail = Auth.auth().currentUser?.email ?? "User"
+    
+    func getData() {
+        let db = Firestore.firestore()
+        
+        db.collection("notes").document(userEmail).collection("userNotes").getDocuments() { snapshot, error in
+            if error == nil {
+                // No errors
+                if let snapshot = snapshot {
+                    // Update the list property in the main thread
+                    DispatchQueue.main.async {
+                        // Get all the documents and create Todos
+                        self.list = snapshot.documents.map { d in
+                            // Create a Todo item for each document returned
+                            return Notes(id: d.documentID,
+                                         title: d["title"] as? String ?? "",
+                                         note: d["note"] as? String ?? "",
+                                         creation_date: d["creation_date"] as? String ?? "",
+                                         email: d["email"] as? String ?? "")
+                        }
+                    }
+                }
+            }
+            else {
+                // Handle the error
+            }
+        }
     }
+    
 }
 
-struct fetchNoteData_Previews: PreviewProvider {
-    static var previews: some View {
-        fetchNoteData()
-    }
-}

@@ -41,8 +41,14 @@ class AppViewModel: ObservableObject {
             DispatchQueue.main.async {
                 //Success
                 let auth = Auth.auth()
+                //start of creation date
+                let date_original = Date()
+                let dateFormatter = DateFormatter()
+                dateFormatter.dateFormat = "YYYY, MMM d"
+                let date_formatted = dateFormatter.string(from: date_original)
+                //end of creation date
                 guard let uid = auth.currentUser?.uid else { return }
-                let userData = ["firstName": firstName, "lastName": lastName, "email": email, "uid": uid]
+                let userData = ["firstName": firstName, "lastName": lastName, "email": email, "uid": uid, "creation_date": date_formatted]
                 Firestore.firestore().collection("users")
                         .document(uid).setData(userData) { err in
                             if let err = err {
@@ -61,21 +67,22 @@ class AppViewModel: ObservableObject {
         
         self.signedIn = false
     }
-    
 }
 
 struct loginView: View {
     @EnvironmentObject var viewModel: AppViewModel
     
     var body: some View {
-        NavigationView {
+        VStack {
             if viewModel.signedIn {
                 VStack {
                     MainContent()
                 }
                 
             } else {
+                NavigationView {
                 SignInView()
+                }
             }
         }
         .onAppear {
@@ -181,7 +188,15 @@ struct SignUpView: View {
                     .background(Color(.secondarySystemBackground))
                 
                 Button(action: {
-                    if (email.isEmpty) {
+                    if (firstName.isEmpty) {
+                        errorMessage = "Please enter a first name!"
+                        return
+                    }
+                    else if (lastName.isEmpty) {
+                        errorMessage = "Please enter a last name!"
+                        return
+                    }
+                    else if (email.isEmpty) {
                         errorMessage = "Email cannot be empty!"
                         return
                     } else if (password.isEmpty) {

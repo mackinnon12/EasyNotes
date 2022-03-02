@@ -14,6 +14,7 @@ struct Settings: View {
     @State private var userEmail = Auth.auth().currentUser?.email ?? "User"
     
     var body: some View {
+        NavigationView {
         VStack {
             Text("You are signed in as \(userEmail)")
             NavigationLink("Change Password", destination: changePassword())
@@ -30,7 +31,8 @@ struct Settings: View {
                     .padding()
             })
         }
-        //.navigationTitle("Settings")
+        .navigationTitle("Settings")
+        }
     }
     
 }
