@@ -26,7 +26,7 @@ class NoteViewModel: ObservableObject {
                     DispatchQueue.main.async {
                         // Get all the documents and create
                         self.list = snapshot.documents.map { d in
-                            // Create a Todo item for each document returned
+                            // Create a item for each document returned
                             return Notes(id: d.documentID,
                                          title: d["title"] as? String ?? "",
                                          note: d["note"] as? String ?? "",
