@@ -19,18 +19,35 @@ struct NotesView: View {
         NavigationView {
             VStack {
                 List (note.list) { item in
-                    NavigationLink(destination: EditNoteView(title: item.title, note: item.note)) {
-                    VStack(alignment: .leading) {
-                    Text(item.title)
-                            .font(.title3)
-                            .fontWeight(.semibold)
-                    Text(item.note)
-                            .font(.subheadline)
-                    Text(item.creation_date)
-                            .font(.caption)
-                            .foregroundColor(.gray)
-                    }
-                    .searchable(text: $searchText)
+                        NavigationLink(destination: EditNoteView(title: item.title, note: item.note)) {
+                            VStack(alignment: .leading) {
+                                Text(item.title)
+                                    .font(.title3)
+                                    .fontWeight(.semibold)
+                                Text(item.note)
+                                    .font(.subheadline)
+                                Text(item.creation_date)
+                                    .font(.caption)
+                                    .foregroundColor(.gray)
+                            }
+                            .searchable(text: $searchText)
+                        }
+                        .swipeActions(allowsFullSwipe: false) {
+                            Button (role: .destructive) {
+                                print("deleted")
+                                note.deleteNote(noteID: item.id)
+                                note.getData()
+                            } label: {
+                                Label("Delete", systemImage: "trash.circle.fill")
+                            }
+                        }
+                        .swipeActions (edge: .leading, allowsFullSwipe: false){
+                        Button {
+                            print("pinned")
+                        } label: {
+                            Label("Pin", systemImage: "pin.circle.fill")
+                        }
+                        .tint(.orange)
                     }
                 }
             }
@@ -48,8 +65,8 @@ struct NotesView: View {
     }
 }
 
-struct NotesView_Previews: PreviewProvider {
-    static var previews: some View {
-        NotesView()
-    }
-}
+//struct NotesView_Previews: PreviewProvider {
+//    static var previews: some View {
+//        NotesView()
+//    }
+//}

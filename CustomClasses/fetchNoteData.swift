@@ -42,5 +42,16 @@ class NoteViewModel: ObservableObject {
         }
     }
     
+    func deleteNote(noteID: String) {
+        let db = Firestore.firestore()
+        db.collection("notes").document(userEmail).collection("userNotes").document(noteID).delete() { err in
+            if let err = err {
+                print("Error removing document: \(err)")
+            } else {
+                print("Note successfully deleted!")
+            }
+        }
+    }
+    
 }
 
