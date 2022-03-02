@@ -24,7 +24,7 @@ class NoteViewModel: ObservableObject {
                 if let snapshot = snapshot {
                     // Update the list property in the main thread
                     DispatchQueue.main.async {
-                        // Get all the documents and create Todos
+                        // Get all the documents and create
                         self.list = snapshot.documents.map { d in
                             // Create a Todo item for each document returned
                             return Notes(id: d.documentID,
