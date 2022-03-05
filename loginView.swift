@@ -19,15 +19,20 @@ class AppViewModel: ObservableObject {
     var isSignedIn: Bool {
         return auth.currentUser != nil
     }
-    
     func signIn(email: String, password: String) {
-            auth.signIn(withEmail: email, password: password) { [weak self] result, error in
-                guard result != nil, error == nil else {
+        auth.signIn(withEmail: email, password: password) { [weak self] result, error in
+            guard result != nil, error == nil else {
                     return
                 }
                 DispatchQueue.main.async {
                     //Success
+                    let auth = Auth.auth()
+                    if auth.currentUser?.isEmailVerified == true {
                     self?.signedIn = true
+                    } else {
+                        self?.signedIn = false
+                        print("Please verify your email")
+                    }
                 }
             }
         }
@@ -41,6 +46,8 @@ class AppViewModel: ObservableObject {
             DispatchQueue.main.async {
                 //Success
                 let auth = Auth.auth()
+                auth.currentUser?.sendEmailVerification()
+                print("Please verify your email")
                 //start of creation date
                 let date_original = Date()
                 let dateFormatter = DateFormatter()
@@ -57,7 +64,9 @@ class AppViewModel: ObservableObject {
                             }
                             print("Success")
                         }
+                if auth.currentUser?.isEmailVerified == true {
                 self?.signedIn = true
+                }
             }
         }
     }
@@ -71,14 +80,14 @@ class AppViewModel: ObservableObject {
 
 struct loginView: View {
     @EnvironmentObject var viewModel: AppViewModel
+    let auth = Auth.auth()
     
     var body: some View {
         VStack {
-            if viewModel.signedIn {
+            if viewModel.signedIn && auth.currentUser?.isEmailVerified == true {
                 VStack {
                     MainContent()
                 }
-                
             } else {
                 NavigationView {
                 SignInView()
@@ -93,6 +102,7 @@ struct loginView: View {
 
 struct SignInView: View {
     
+    let auth = Auth.auth()
     @State var errorMessage = ""
     @State var email = ""
     @State var password = ""
@@ -155,6 +165,8 @@ struct SignInView: View {
 }
 
 struct SignUpView: View {
+    @State private var showingAlert = false
+    @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
     @State var firstName = ""
     @State var lastName = ""
     @State var email = ""
@@ -207,6 +219,8 @@ struct SignUpView: View {
                         return
                     }
                     errorMessage = ""
+                    showingAlert = true
+                    self.presentationMode.wrappedValue.dismiss()
                     viewModel.signUp(firstName: firstName, lastName: lastName, email: email, password: password)
                     
                 }, label: {
@@ -216,6 +230,13 @@ struct SignUpView: View {
                         .background(Color.pink)
                         .cornerRadius(8)
                 })
+            }
+            .alert(isPresented:$showingAlert) {
+                Alert(
+                title: Text("Account Created"),
+                message: Text("Please verify your email"),
+                dismissButton: .default(Text("Okay"))
+                )
             }
             .padding()
             

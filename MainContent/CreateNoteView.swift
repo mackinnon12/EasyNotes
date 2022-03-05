@@ -21,15 +21,16 @@ struct CreateNoteView: View {
     
     var body: some View {
         VStack {
-        TextField("Enter a title", text: $title)
+            TextField("Enter a title", text: $title)
                 .font(Font.title.weight(.heavy))
-                
                 .padding(10)
-        TextField("Start typing here...", text: $note)
-                .padding(10)
+//            TextField("Start typing here...", text: $note)
+//                .padding(6)
+                TextEditor(text: $note)
+                    .padding(6)
+            
         }
         NavigationView {
-            
         }
         .navigationBarTitle("Create Note", displayMode: .inline)
         .navigationBarBackButtonHidden(true)
@@ -68,22 +69,16 @@ struct CreateNoteView: View {
 }
 
 func createNote(title: String, note: String, email: String) {
-        DispatchQueue.main.async {
-            //Success
-            //start of creation date
-            let date_original = Date()
-            let dateFormatter = DateFormatter()
-            dateFormatter.dateFormat = "YYYY, MMM d"
-            let date_formatted = dateFormatter.string(from: date_original)
-            //end of creation date
-            let noteData = ["title": title, "note": note, "email": email, "creation_date": date_formatted]
-            //Firestore.firestore().collection("notes").document(email).setData(noteData)
-            Firestore.firestore().collection("notes").document(email).collection("userNotes").document().setData(noteData)
-        }
-    }
-
-struct CreateNoteView_Previews: PreviewProvider {
-    static var previews: some View {
-        CreateNoteView()
+    DispatchQueue.main.async {
+        //Success
+        //start of creation date
+        let date_original = Date()
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "YYYY, MMM d"
+        let date_formatted = dateFormatter.string(from: date_original)
+        //end of creation date
+        let noteData = ["title": title, "note": note, "email": email, "creation_date": date_formatted]
+        //Firestore.firestore().collection("notes").document(email).setData(noteData)
+        Firestore.firestore().collection("notes").document(email).collection("userNotes").document().setData(noteData)
     }
 }

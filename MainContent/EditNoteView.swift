@@ -20,7 +20,6 @@ struct EditNoteView: View {
         VStack {
         TextField("Enter a title", text: $title)
                 .font(Font.title.weight(.heavy))
-                
                 .padding(10)
         TextField("Start typing here...", text: $note)
                 .padding(10)

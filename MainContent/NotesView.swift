@@ -26,6 +26,7 @@ struct NotesView: View {
                                     .fontWeight(.semibold)
                                 Text(item.note)
                                     .font(.subheadline)
+                                    .lineLimit(1)
                                 Text(item.creation_date)
                                     .font(.caption)
                                     .foregroundColor(.gray)
