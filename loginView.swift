@@ -29,11 +29,9 @@ class AppViewModel: ObservableObject {
                 //Success
                 let auth = Auth.auth()
                 if auth.currentUser?.isEmailVerified == true {
-                    self?.emailVerified = true
                     self?.signedIn = true
                 } else {
                     self?.signedIn = false
-                    self?.emailVerified = false
                     print("Please verify your email")
                 }
             }
