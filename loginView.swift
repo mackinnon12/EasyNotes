@@ -11,7 +11,7 @@ import Firebase
 import FirebaseFirestore
 
 class AppViewModel: ObservableObject {
-    @State private var showingError = false;
+    @State private var showingError = false
     let auth = Auth.auth()
     
     @Published var signedIn = false
@@ -19,23 +19,26 @@ class AppViewModel: ObservableObject {
     var isSignedIn: Bool {
         return auth.currentUser != nil
     }
+    
     func signIn(email: String, password: String) {
         auth.signIn(withEmail: email, password: password) { [weak self] result, error in
             guard result != nil, error == nil else {
-                    return
-                }
-                DispatchQueue.main.async {
-                    //Success
-                    let auth = Auth.auth()
-                    if auth.currentUser?.isEmailVerified == true {
+                return
+            }
+            DispatchQueue.main.async {
+                //Success
+                let auth = Auth.auth()
+                if auth.currentUser?.isEmailVerified == true {
+                    self?.emailVerified = true
                     self?.signedIn = true
-                    } else {
-                        self?.signedIn = false
-                        print("Please verify your email")
-                    }
+                } else {
+                    self?.signedIn = false
+                    self?.emailVerified = false
+                    print("Please verify your email")
                 }
             }
         }
+    }
     
     func signUp(firstName: String, lastName: String, email: String, password: String) {
         auth.createUser(withEmail: email, password: password) { [weak self] result, error in
@@ -57,15 +60,15 @@ class AppViewModel: ObservableObject {
                 guard let uid = auth.currentUser?.uid else { return }
                 let userData = ["firstName": firstName, "lastName": lastName, "email": email, "uid": uid, "creation_date": date_formatted]
                 Firestore.firestore().collection("users")
-                        .document(uid).setData(userData) { err in
-                            if let err = err {
-                                print(err)
-                                return
-                            }
-                            print("Success")
+                    .document(uid).setData(userData) { err in
+                        if let err = err {
+                            print(err)
+                            return
                         }
+                        print("Success")
+                    }
                 if auth.currentUser?.isEmailVerified == true {
-                self?.signedIn = true
+                    self?.signedIn = true
                 }
             }
         }
@@ -90,15 +93,17 @@ struct loginView: View {
                 }
             } else {
                 NavigationView {
-                SignInView()
+                    SignInView()
                 }
             }
         }
         .onAppear {
             viewModel.signedIn = viewModel.isSignedIn
+            
         }
     }
 }
+
 
 struct SignInView: View {
     
@@ -106,7 +111,7 @@ struct SignInView: View {
     @State var errorMessage = ""
     @State var email = ""
     @State var password = ""
-    
+    @State var showingAlert = false
     @EnvironmentObject var viewModel: AppViewModel
     
     var body: some View {
@@ -135,11 +140,14 @@ struct SignInView: View {
                     } else if (password.isEmpty) {
                         errorMessage = "Password cannot be empty!"
                         return
+                    } else {
+                        errorMessage = ""
+                        viewModel.signIn(email: email, password: password)
                     }
-                    errorMessage = ""
-                    viewModel.signIn(email: email, password: password)
-                    
-                    
+                    if (auth.currentUser?.isEmailVerified == false) {
+                        errorMessage = "Please verify your email"
+                    }
+        
                 }, label: {
                     Label("Sign In", systemImage: "rectangle.portrait.and.arrow.right.fill")
                         .foregroundColor(Color.white)
@@ -157,7 +165,6 @@ struct SignInView: View {
                 
             }
             .padding()
-            
             Spacer()
         }
         .navigationTitle("Sign In")
@@ -233,9 +240,9 @@ struct SignUpView: View {
             }
             .alert(isPresented:$showingAlert) {
                 Alert(
-                title: Text("Account Created"),
-                message: Text("Please verify your email"),
-                dismissButton: .default(Text("Okay"))
+                    title: Text("Account Created"),
+                    message: Text("Please verify your email"),
+                    dismissButton: .default(Text("Okay"))
                 )
             }
             .padding()
